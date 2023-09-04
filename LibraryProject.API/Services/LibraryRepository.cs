@@ -45,7 +45,11 @@ public class LibraryRepository : ILibraryRepository
 
     public async Task<Author> GetAuthorAsync(Guid authorId)
     {
-        throw new NotImplementedException();
+        if (authorId == Guid.Empty) throw new ArgumentNullException(nameof(authorId));
+
+#pragma warning disable CS8603
+        return await _context.Authors.FirstOrDefaultAsync(a => a.Id == authorId);
+#pragma warning restore CS8603
     }
 
     public void AddAuthor(Author author)
@@ -69,7 +73,12 @@ public class LibraryRepository : ILibraryRepository
 
     public async Task<bool> AuthorExistsAsync(Guid authorId)
     {
-        throw new NotImplementedException();
+        if (authorId == Guid.Empty)
+        {
+            throw new ArgumentNullException(nameof(authorId));
+        }
+
+        return await _context.Authors.AnyAsync(a => a.Id == authorId);
     }
 
     public async Task<bool> SaveAsync()

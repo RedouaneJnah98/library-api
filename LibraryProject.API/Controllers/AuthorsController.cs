@@ -19,13 +19,28 @@ public class AuthorsController : ControllerBase
         _libraryRepository = libraryRepository ?? throw new ArgumentNullException(nameof(libraryRepository));
     }
 
-    [HttpGet(Name = "GetAuthors")]
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors()
     {
         var authorResult = await _libraryRepository
             .GetAuthorsAsync();
 
         return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorResult));
+    }
+
+    [HttpGet("{authorId}", Name = "GetAuthor")]
+    public async Task<ActionResult<AuthorDto>> GetAuthorAsync(Guid authorId)
+    {
+        if (!await _libraryRepository.AuthorExistsAsync(authorId))
+        {
+            throw new ArgumentNullException(nameof(authorId));
+        }
+
+        // get result from repository
+        var authorEntity = await _libraryRepository.GetAuthorAsync(authorId);
+        var authorToReturn = _mapper.Map<AuthorDto>(authorEntity);
+
+        return Ok(authorToReturn);
     }
 
     [HttpPost]
@@ -38,7 +53,7 @@ public class AuthorsController : ControllerBase
 
         var authorToReturn = _mapper.Map<AuthorDto>(authorEntity);
 
-        return CreatedAtRoute("GetAuthors",
+        return CreatedAtRoute("GetAuthor",
             new { authorId = authorToReturn.Id },
             authorToReturn);
     }

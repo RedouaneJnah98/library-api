@@ -63,7 +63,9 @@ public class LibraryRepository : ILibraryRepository
 
     public void UpdateAuthor(Author author)
     {
-        throw new NotImplementedException();
+        if (author == null) throw new ArgumentNullException(nameof(author));
+        
+        //
     }
 
     public void DeleteAuthor(Author author)
@@ -73,10 +75,7 @@ public class LibraryRepository : ILibraryRepository
 
     public async Task<bool> AuthorExistsAsync(Guid authorId)
     {
-        if (authorId == Guid.Empty)
-        {
-            throw new ArgumentNullException(nameof(authorId));
-        }
+        if (authorId == Guid.Empty) throw new ArgumentNullException(nameof(authorId));
 
         return await _context.Authors.AnyAsync(a => a.Id == authorId);
     }

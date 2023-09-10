@@ -16,5 +16,6 @@ public class AuthorProfile : Profile
                 opt.MapFrom(src => src.DateOfBirth.GetCurrentAge()));
 
         CreateMap<AuthorForCreationDto, Author>();
+        CreateMap<AuthorForUpdateDto, Author>();
     }
 }

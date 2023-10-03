@@ -64,8 +64,6 @@ public class LibraryRepository : ILibraryRepository
     public void UpdateAuthor(Author author)
     {
         if (author == null) throw new ArgumentNullException(nameof(author));
-        
-        //
     }
 
     public void DeleteAuthor(Author author)

@@ -2,6 +2,7 @@ using AutoMapper;
 using LibraryProject.API.Entities;
 using LibraryProject.API.Models;
 using LibraryProject.API.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryProject.API.Controllers;
@@ -28,7 +29,7 @@ public class AuthorsController : ControllerBase
         return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authorResult));
     }
 
-    [HttpGet("{authorId}", Name = "GetAuthor")]
+    [HttpGet("{authorId:guid}", Name = "GetAuthor")]
     public async Task<ActionResult<AuthorDto>> GetAuthorAsync(Guid authorId)
     {
         if (!await _libraryRepository.AuthorExistsAsync(authorId)) return NotFound();
@@ -65,6 +66,37 @@ public class AuthorsController : ControllerBase
         _mapper.Map(author, authorFromRepo);
 
         _libraryRepository.UpdateAuthor(authorFromRepo);
+        await _libraryRepository.SaveAsync();
+
+        return NoContent();
+    }
+
+    [HttpPatch("{authorId:guid}")]
+    public async Task<IActionResult> PartiallyUpdateAuthor(Guid authorId,
+        JsonPatchDocument<AuthorForUpdateDto> patchDocument)
+    {
+        if (!await _libraryRepository.AuthorExistsAsync(authorId)) return NotFound();
+
+        var authorFromRepo = await _libraryRepository.GetAuthorAsync(authorId);
+        var authorToPatch = _mapper.Map<AuthorForUpdateDto>(authorFromRepo);
+
+        patchDocument.ApplyTo(authorToPatch);
+        _mapper.Map(authorToPatch, authorFromRepo);
+
+        _libraryRepository.UpdateAuthor(authorFromRepo);
+        await _libraryRepository.SaveAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{authorId:guid}")]
+    public async Task<IActionResult> DeleteAuthor(Guid authorId)
+    {
+        if (!await _libraryRepository.AuthorExistsAsync(authorId)) return NotFound();
+
+        var authorFromRepo = await _libraryRepository.GetAuthorAsync(authorId);
+        
+        _libraryRepository.DeleteAuthor(authorFromRepo);
         await _libraryRepository.SaveAsync();
 
         return NoContent();

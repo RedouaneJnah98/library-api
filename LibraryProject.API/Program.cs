@@ -1,16 +1,21 @@
 using LibraryProject.API.DbContexts;
 using LibraryProject.API.Services;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(setupAction =>
+    {
+        setupAction.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+    });
 builder.Services.AddDbContext<LibraryContext>(options =>
 {
     options.UseNpgsql("Host=localhost;Database=library-api-db;Username=postgres;Password=#rootAdmin");
-});
+}); 
 
 builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

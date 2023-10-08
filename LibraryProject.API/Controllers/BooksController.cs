@@ -29,6 +29,17 @@ public class BooksController : ControllerBase
         return Ok(_mapper.Map<IEnumerable<BookDto>>(booksFromRepo));
     }
 
+    [HttpGet("{bookId:guid}", Name = "GetBookForAuthor")]
+    public async Task<ActionResult<BookDto>> GetBookForAuthor(Guid authorId, Guid bookId)
+    {
+        if (!await _libraryRepository.AuthorExistsAsync(authorId)) return NotFound();
+
+        var bookFromRepo = await _libraryRepository.GetBookAsync(authorId, bookId);
+        if (bookFromRepo == null) return NotFound();
+
+        return Ok(_mapper.Map<BookDto>(bookFromRepo));
+    }
+
     [HttpPost]
     public async Task<ActionResult<BookDto>> CreateBookForAuthor(Guid authorId, BookForCreationDto book)
     {
@@ -40,6 +51,8 @@ public class BooksController : ControllerBase
 
         var bookToReturn = _mapper.Map<BookDto>(bookEntity);
 
-        return Ok(bookToReturn);
+        return CreatedAtAction("GetBookForAuthor",
+            new { bookId = bookToReturn.Id },
+            bookToReturn);
     }
 }

@@ -25,7 +25,15 @@ public class LibraryRepository : ILibraryRepository
 
     public async Task<Book> GetBookAsync(Guid authorId, Guid bookId)
     {
-        throw new NotImplementedException();
+        if (authorId == Guid.Empty) throw new ArgumentNullException(nameof(authorId));
+
+        if (bookId == Guid.Empty) throw new ArgumentNullException(nameof(bookId));
+
+#pragma warning disable CS8603
+        return await _context.Books
+            .Where(b => b.AuthorId == authorId && b.Id == bookId)
+            .FirstOrDefaultAsync();
+#pragma warning restore CS8603
     }
 
     public void AddBook(Guid authorId, Book book)

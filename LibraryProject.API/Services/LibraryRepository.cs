@@ -13,9 +13,14 @@ public class LibraryRepository : ILibraryRepository
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    public async Task<IEnumerable<Book>> GetBooksAsync()
+    public async Task<IEnumerable<Book>> GetBooksAsync(Guid authorId)
     {
-        throw new NotImplementedException();
+        if (authorId == Guid.Empty) throw new ArgumentNullException(nameof(authorId));
+
+        return await _context.Books
+            .Where(b => b.AuthorId == authorId)
+            .OrderBy(b => b.Title)
+            .ToListAsync();
     }
 
     public async Task<Book> GetBookAsync(Guid authorId, Guid bookId)
@@ -25,7 +30,12 @@ public class LibraryRepository : ILibraryRepository
 
     public void AddBook(Guid authorId, Book book)
     {
-        throw new NotImplementedException();
+        if (authorId == Guid.Empty) throw new ArgumentNullException(nameof(authorId));
+
+        if (book == null) throw new ArgumentNullException(nameof(book));
+
+        book.AuthorId = authorId;
+        _context.Books.Add(book);
     }
 
     public void UpdateBook(Book book)
@@ -68,7 +78,7 @@ public class LibraryRepository : ILibraryRepository
 
     public void DeleteAuthor(Author author)
     {
-        throw new NotImplementedException();
+        _context.Authors.Remove(author);
     }
 
     public async Task<bool> AuthorExistsAsync(Guid authorId)

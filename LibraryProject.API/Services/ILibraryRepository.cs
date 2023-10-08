@@ -4,7 +4,7 @@ namespace LibraryProject.API.Services;
 
 public interface ILibraryRepository
 {
-    Task<IEnumerable<Book>> GetBooksAsync();
+    Task<IEnumerable<Book>> GetBooksAsync(Guid authorId);
     Task<Book> GetBookAsync(Guid authorId, Guid bookId);
     void AddBook(Guid authorId, Book book);
     void UpdateBook(Book book);
